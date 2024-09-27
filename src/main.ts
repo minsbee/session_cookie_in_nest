@@ -4,8 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './commons/filters/http-exception.filter';
 import * as session from 'express-session';
-import * as cookieParser from 'cookie-parser';
-
+import * as passport from 'passport';
 
 const bootstrap = async () => {
   const app = await NestFactory.create(AppModule);
@@ -27,19 +26,20 @@ const bootstrap = async () => {
   });
 
   // 세션 설정
-  app.use(cookieParser());
-  app.use(
-    session({
-      secret: process.env.SESSION_SECRET!,
-      resave: false,
-      saveUninitialized: false,
-      cookie: {
-        maxAge: 1000 * 60 * 60 * 24,
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-      },
-    }),
-  );
+  const sessionMiddleware = session({
+    secret: 'process.env.SESSION_SECRET',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24, // 24시간
+      httpOnly: true,
+      secure: false,
+    },
+  });
+  app.use(sessionMiddleware);
+
+  app.use(passport.initialize());
+  app.use(passport.session());
 
   // Swagger 설정
   const swaggerOptions = new DocumentBuilder()
