@@ -1,4 +1,4 @@
-import { Controller, Get, Patch } from '@nestjs/common';
+import { Controller, Delete, Get, Patch } from '@nestjs/common';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 import { FindUserByParamsInput } from './dto/findUserByParams.dto';
@@ -27,5 +27,10 @@ export class UserController {
     updateUserInput: UpdateUserInput,
   ): Promise<User> {
     return await this.userService.updateUser(id, { updateUserInput });
+  }
+
+  @Delete('/delete/:id')
+  async deleteUser(id: string): Promise<User> {
+    return await this.userService.deleteUser(id);
   }
 }

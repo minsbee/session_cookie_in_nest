@@ -58,4 +58,12 @@ export class UserService {
       throw new InternalServerErrorException('유저 수정에 실패하였습니다.');
     }
   }
+
+  async deleteUser(id: string): Promise<User> {
+    try {
+      return await this.prismaService.user.delete({ where: { id } });
+    } catch (error) {
+      throw new InternalServerErrorException('유저 삭제에 실패하였습니다.');
+    }
+  }
 }

@@ -1,16 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
+import { UserService } from '../user/user.service';
+import { PrismaService } from '../../commons/prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+  private readonly userService: UserService,
+  ) {}
 
-  async validateUser(username: string, password: string): Promise<any> {
-    const user = await this.usersService.findOneByUsername(username);
-    if (user && user.password === password) {
-      const { password, ...result } = user;
-      return result;
-    }
-    return null;
-  }
 }
