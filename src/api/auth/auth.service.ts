@@ -1,14 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UserService } from '../user/user.service';
 import { PrismaService } from '../../commons/prisma/prisma.service';
 import { User } from '../user/user.entity';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly userService: UserService,
   ) {}
 
   async validateUser(email: string, password: string): Promise<User> {
@@ -28,4 +26,5 @@ export class AuthService {
 
     return user;
   }
+
 }

@@ -32,7 +32,7 @@ const bootstrap = async () => {
     saveUninitialized: true,
     cookie: {
       maxAge: 1000 * 60 * 60 * 24, // 24시간
-      httpOnly: true,
+      // httpOnly: true,
       secure: false,
     },
   });

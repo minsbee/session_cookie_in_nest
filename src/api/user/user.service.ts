@@ -9,15 +9,15 @@ import { UserOmitPassword } from './types/user-types';
 import { IUserServiceFindUserByParams } from './interfaces/find-user-by-params.interface';
 import { IUserServiceUpdate } from './interfaces/update-user.interface';
 import { IUserServiceCreate } from './interfaces/create-user.interface';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createUser(createUserInput: IUserServiceCreate): Promise<User> {
+  async createUser({createUserInput}: IUserServiceCreate): Promise<User> {
     const user = await this.prismaService.user.findUnique({
-      where: { email: createUserInput.createUserInput.email },
+      where: { email: createUserInput.email },
     });
 
     if (user) {
@@ -29,9 +29,9 @@ export class UserService {
 
       return await this.prismaService.user.create({
         data: {
-          ...createUserInput.createUserInput,
+          ...createUserInput,
           password: await bcrypt.hash(
-            createUserInput.createUserInput.password,
+            createUserInput.password,
             salt,
           ),
         },
