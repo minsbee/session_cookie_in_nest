@@ -8,7 +8,8 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('/login')
-  async login(@Request() req: ExpressRequest) { // Use the imported ExpressRequest type
+  async login(@Request() req: ExpressRequest) {
+    // Use the imported ExpressRequest type
     return req.user;
   }
 }

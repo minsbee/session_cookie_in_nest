@@ -8,7 +8,11 @@ import { LocalStrategy } from './strategies/session-local.strategy';
 import { SessionSerializer } from './session/session.serializer';
 
 @Module({
-  imports: [PrismaModule, UserModule, PassportModule.register({ session: true })],
+  imports: [
+    PrismaModule,
+    UserModule,
+    PassportModule.register({ session: true }),
+  ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, SessionSerializer],
 })

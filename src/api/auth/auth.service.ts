@@ -5,9 +5,7 @@ import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly prismaService: PrismaService,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   async validateUser(email: string, password: string): Promise<User> {
     const user = await this.prismaService.user.findUnique({
@@ -26,5 +24,4 @@ export class AuthService {
 
     return user;
   }
-
 }
