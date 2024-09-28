@@ -8,10 +8,38 @@ import { User } from './user.entity';
 import { UserOmitPassword } from './types/user-types';
 import { IUserServiceFindUserByParams } from './interfaces/find-user-by-params.interface';
 import { IUserServiceUpdate } from './interfaces/update-user.interface';
+import { IUserServiceCreate } from './interfaces/create-user.interface';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
+
+  async createUser(createUserInput: IUserServiceCreate): Promise<User> {
+    const user = await this.prismaService.user.findUnique({
+      where: { email: createUserInput.createUserInput.email },
+    });
+
+    if (user) {
+      throw new InternalServerErrorException('유저가 이미 존재합니다.');
+    }
+
+    try {
+      const salt = await bcrypt.genSalt(10);
+
+      return await this.prismaService.user.create({
+        data: {
+          ...createUserInput.createUserInput,
+          password: await bcrypt.hash(
+            createUserInput.createUserInput.password,
+            salt,
+          ),
+        },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('유저 생성에 실패하였습니다.');
+    }
+  }
 
   async getAllUsers(): Promise<User[]> {
     try {
