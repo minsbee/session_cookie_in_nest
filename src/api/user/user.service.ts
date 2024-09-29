@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -43,7 +44,9 @@ export class UserService {
 
   async getAllUsers(): Promise<User[]> {
     try {
-      const result = await this.prismaService.user.findMany();
+      const result = await this.prismaService.user.findMany(
+        { where: { deletedAt: null } },
+      );
       if (!result) throw new NotFoundException('유저목록이 존재하지 않습니다.');
       return result;
     } catch (error) {
@@ -57,13 +60,19 @@ export class UserService {
     params,
   }: IUserServiceFindUserByParams): Promise<UserOmitPassword> {
     try {
-      return await this.prismaService.user.findFirstOrThrow({
+      const user = await this.prismaService.user.findFirstOrThrow({
         where: {
           id: params.id,
           email: params.email,
           name: params.name,
+          deletedAt: null,
         },
       });
+
+      if(!user) throw new NotFoundException('유저가 존재하지 않습니다.');
+
+      const {password, ...result} = user;
+      return result;
     } catch (error) {
       // `findFirstOrThrow` 자체가 NotFoundException을 던짐
       throw new InternalServerErrorException(
@@ -75,12 +84,24 @@ export class UserService {
 
   async updateUser(
     id: string,
-    updateUserInput: IUserServiceUpdate,
+    {updateUserInput}: IUserServiceUpdate,
   ): Promise<User> {
     try {
+      const user = await this.prismaService.user.findUnique({
+        where: { id },
+      });
+      if (!user) {
+        throw new NotFoundException('유저를 찾을 수 없습니다.');
+      } else if (user.deletedAt !== null) {
+        throw new ConflictException('삭제된 유저입니다.');
+      }
+
       return await this.prismaService.user.update({
         where: { id },
-        data: { ...updateUserInput },
+        data: {
+          ...updateUserInput.email ? { email: updateUserInput.email } : {},
+          ...updateUserInput.name ? { name: updateUserInput.name } : {},
+        },
       });
     } catch (error) {
       throw new InternalServerErrorException('유저 수정에 실패하였습니다.');
@@ -89,6 +110,15 @@ export class UserService {
 
   async deleteUser(id: string): Promise<User> {
     try {
+      const user = await this.prismaService.user.findUnique({
+        where: { id },
+      });
+      if (!user) {
+        throw new NotFoundException('유저를 찾을 수 없습니다.');
+      } else if (user.deletedAt !== null) {
+        throw new ConflictException('삭제된 유저입니다.');
+      }
+
       return await this.prismaService.user.delete({ where: { id } });
     } catch (error) {
       throw new InternalServerErrorException('유저 삭제에 실패하였습니다.');

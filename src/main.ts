@@ -9,7 +9,7 @@ import * as passport from 'passport';
 const bootstrap = async () => {
   const app = await NestFactory.create(AppModule);
   const PORT = process.env.PORT || 4000;
-  const Address = 'localhost:4000';
+const Address = process.env.ADDRESS ?? 'http://localhost:4000';
 
   // 전역 설정
   app.setGlobalPrefix('api');
@@ -45,12 +45,7 @@ const bootstrap = async () => {
   const swaggerOptions = new DocumentBuilder()
     .setTitle('session_cookie API')
     .setDescription('session_cookie API Description')
-    .setVersion('3.0')
-    .addBearerAuth({
-      type: 'http',
-      scheme: 'bearer',
-      bearerFormat: 'JWT',
-    });
+    .setVersion('3.0');
 
   // 환경에 따라 Swagger 서버 추가
   if (process.env.NODE_ENV === 'production') {
