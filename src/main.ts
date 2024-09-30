@@ -54,8 +54,8 @@ const bootstrap = async () => {
     console.log('Redis 접속 완료');
   });
 
-  redisClient.on('ready', () => {
-    console.log('Redis is ready to store sessions');
+  redisClient.on('disconnect', () => {
+    console.log('Redis 접속 해제');
   });
 
   // Swagger 설정
