@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 import { FindUserByParamsInput } from './dto/findUserByParams.dto';
@@ -15,7 +23,7 @@ export class UserController {
   @ApiOperation({ summary: '유저 생성' })
   @ApiBody({ type: CreateUserInput })
   @Post('/create')
-  async createUser(@Body()createUserInput: CreateUserInput): Promise<User> {
+  async createUser(@Body() createUserInput: CreateUserInput): Promise<User> {
     return await this.userService.createUser({ createUserInput });
   }
 
@@ -29,7 +37,7 @@ export class UserController {
   @ApiBody({ type: FindUserByParamsInput })
   @Post('/find')
   async findUserByParams(
-    @Body()params: FindUserByParamsInput,
+    @Body() params: FindUserByParamsInput,
   ): Promise<UserOmitPassword> {
     return await this.userService.findUserByParams({ params });
   }
@@ -39,8 +47,8 @@ export class UserController {
   @ApiBody({ required: false, type: UpdateUserInput })
   @Patch('/:id')
   async updateUser(
-    @Param('id')id: string,
-    @Body()updateUserInput: UpdateUserInput,
+    @Param('id') id: string,
+    @Body() updateUserInput: UpdateUserInput,
   ): Promise<User> {
     return await this.userService.updateUser(id, { updateUserInput });
   }
@@ -48,7 +56,7 @@ export class UserController {
   @ApiOperation({ summary: '유저 삭제' })
   @ApiParam({ name: 'id', description: '유저 ID' })
   @Delete('/delete/:id')
-  async deleteUser(@Param('id')id: string): Promise<User> {
+  async deleteUser(@Param('id') id: string): Promise<User> {
     return await this.userService.deleteUser(id);
   }
 }

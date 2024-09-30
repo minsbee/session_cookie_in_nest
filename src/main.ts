@@ -9,7 +9,7 @@ import * as passport from 'passport';
 const bootstrap = async () => {
   const app = await NestFactory.create(AppModule);
   const PORT = process.env.PORT || 4000;
-const Address = process.env.ADDRESS ?? 'http://localhost:4000';
+  const Address = process.env.ADDRESS ?? 'http://localhost:4000';
 
   // 전역 설정
   app.setGlobalPrefix('api');
