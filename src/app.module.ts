@@ -3,6 +3,7 @@ import { PrismaModule } from './commons/prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './api/user/user.module';
 import { AuthModule } from './api/auth/auth.module';
+import { RedisModule } from './commons/redis/redis.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { AuthModule } from './api/auth/auth.module';
       isGlobal: true,
     }),
     PrismaModule,
+    RedisModule,
     UserModule,
     AuthModule,
   ],

@@ -6,10 +6,12 @@ import { UserModule } from '../user/user.module';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategies/session-local.strategy';
 import { SessionSerializer } from './session/session.serializer';
+import { RedisModule } from '../../commons/redis/redis.module';
 
 @Module({
   imports: [
     PrismaModule,
+    RedisModule,
     UserModule,
     PassportModule.register({ session: true }),
   ],

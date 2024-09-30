@@ -5,6 +5,8 @@ import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './commons/filters/http-exception.filter';
 import * as session from 'express-session';
 import * as passport from 'passport';
+import { RedisService } from './commons/redis/redis.service';
+import RedisStore from 'connect-redis';
 
 const bootstrap = async () => {
   const app = await NestFactory.create(AppModule);
@@ -25,21 +27,36 @@ const bootstrap = async () => {
     credentials: true,
   });
 
-  // 세션 설정
-  const sessionMiddleware = session({
-    secret: 'process.env.SESSION_SECRET',
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 24, // 24시간
-      // httpOnly: true,
-      secure: false,
-    },
-  });
-  app.use(sessionMiddleware);
+  // redis 설정
+  const redisService = app.get(RedisService);
+  const redisClient = redisService.getClient();
+
+  // 세션 설정 (중복 제거)
+  app.use(
+    session({
+      store: new RedisStore({ client: redisClient }),
+      secret: process.env.SESSION_SECRET!, // .env 파일에서 가져옴
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        maxAge: 1000 * 60 * 60 * 24, // 24시간
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', // 배포 환경에서만 secure 설정
+      },
+    }),
+  );
 
   app.use(passport.initialize());
   app.use(passport.session());
+
+  // redis 세션 저장 확인용 로깅 (선택 사항)
+  redisClient.on('connect', () => {
+    console.log('Redis 접속 완료');
+  });
+
+  redisClient.on('ready', () => {
+    console.log('Redis is ready to store sessions');
+  });
 
   // Swagger 설정
   const swaggerOptions = new DocumentBuilder()
